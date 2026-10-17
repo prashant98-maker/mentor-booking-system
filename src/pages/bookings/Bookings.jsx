@@ -1,14 +1,10 @@
-﻿import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import BookingCard from '../../components/BookingCard'
 import { cancelBooking, getBookings } from '../../services/bookingService'
 
 function Bookings() {
-  const [bookings, setBookings] = useState([])
-
-  useEffect(() => {
-    setBookings(getBookings())
-  }, [])
+  const [bookings, setBookings] = useState(() => getBookings())
 
   function handleCancel(id) {
     cancelBooking(id)

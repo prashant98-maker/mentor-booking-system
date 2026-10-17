@@ -50,3 +50,5 @@ Thumbs.db
 *.swo
 
 src/components/*.backup
+server/.env
+!server/.env.example

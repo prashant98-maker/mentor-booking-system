@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getProfilePhoto } from '../services/profilePhotoService'
@@ -17,8 +17,6 @@ function Navbar() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    setProfilePhoto(getProfilePhoto(user))
-
     const updatePhoto = () => setProfilePhoto(getProfilePhoto(user))
     window.addEventListener('mentorhub-profile-photo-updated', updatePhoto)
 
