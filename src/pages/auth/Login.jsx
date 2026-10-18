@@ -1,74 +1,60 @@
 ﻿import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { loginRequest } from '../../services/authService'
 
 function Login() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [role, setRole] = useState('student')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   if (user) {
-    return (
-      <Navigate
-        to={user.role === 'mentor' ? '/mentor-dashboard' : '/student-dashboard'}
-        replace
-      />
-    )
+    return <Navigate to={user.role === 'mentor' ? '/mentor-dashboard' : '/student-dashboard'} replace />
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    login(name, role)
-    navigate(role === 'mentor' ? '/mentor-dashboard' : '/student-dashboard')
+    setError('')
+    setLoading(true)
+
+    try {
+      const result = await loginRequest({ email, password })
+      login(result)
+      navigate(result.user.role === 'mentor' ? '/mentor-dashboard' : '/student-dashboard')
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <main className="mx-auto flex min-h-[75vh] max-w-6xl items-center justify-center px-4 py-10 sm:px-6">
-      <section className="grid w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-xl md:grid-cols-2">
-        <div className="hidden flex-col justify-between bg-gradient-to-br from-blue-700 to-indigo-900 p-10 text-white md:flex">
-          <p className="text-sm font-bold tracking-widest">MENTORHUB</p>
+      <section className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-xl sm:p-10">
+        <p className="font-semibold text-blue-700">WELCOME BACK</p>
+        <h1 className="mt-2 text-3xl font-bold text-slate-900">Login</h1>
+        <p className="mt-2 text-slate-600">Login with your registered email and password.</p>
+
+        {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="mt-7 space-y-5">
           <div>
-            <h1 className="text-4xl font-bold leading-tight">Your next step starts with the right guidance.</h1>
-            <p className="mt-4 leading-7 text-blue-100">Connect with mentors, plan sessions and keep your learning journey organised.</p>
+            <label htmlFor="login-email" className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+            <input id="login-email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-slate-300 px-4 py-3" />
           </div>
-          <p className="text-sm text-blue-100">Learn. Grow. Succeed.</p>
-        </div>
+          <div>
+            <label htmlFor="login-password" className="mb-2 block text-sm font-semibold text-slate-700">Password</label>
+            <input id="login-password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border border-slate-300 px-4 py-3" />
+          </div>
+          <button disabled={loading} type="submit" className="w-full rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-60">
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
 
-        <div className="p-6 sm:p-10">
-          <p className="font-semibold text-blue-700">WELCOME BACK</p>
-          <h2 className="mt-2 text-3xl font-bold text-slate-900">Login</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Choose your demo role to preview the correct dashboard.
-          </p>
-
-          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
-            <div>
-              <label htmlFor="login-name" className="mb-2 block text-sm font-semibold text-slate-700">Your name</label>
-              <input id="login-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Enter your name" className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
-            </div>
-
-            <div>
-              <label htmlFor="login-role" className="mb-2 block text-sm font-semibold text-slate-700">Login as</label>
-              <select id="login-role" value={role} onChange={(event) => setRole(event.target.value)} className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
-                <option value="student">Student</option>
-                <option value="mentor">Mentor</option>
-              </select>
-            </div>
-
-            <button type="submit" className="w-full rounded-xl bg-blue-700 px-5 py-3 font-bold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
-              Continue to dashboard
-            </button>
-          </form>
-
-          <p className="mt-6 text-sm text-slate-600">
-            New here? <Link to="/signup" className="font-bold text-blue-700 underline">Create an account</Link>
-          </p>
-
-          <p className="mt-5 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900">
-            Frontend demo only: this page does not verify passwords or create a secure account yet.
-          </p>
-        </div>
+        <p className="mt-6 text-sm text-slate-600">New here? <Link to="/signup" className="font-bold text-blue-700 underline">Create an account</Link></p>
       </section>
     </main>
   )

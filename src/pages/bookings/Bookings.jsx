@@ -1,43 +1,55 @@
-import { useState } from 'react'
+﻿import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import BookingCard from '../../components/BookingCard'
-import { cancelBooking, getBookings } from '../../services/bookingService'
+import { cancelMyBooking, fetchBookings } from '../../services/databaseService'
 
 function Bookings() {
-  const [bookings, setBookings] = useState(() => getBookings())
+  const [bookings, setBookings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState('')
 
-  function handleCancel(id) {
-    cancelBooking(id)
-    setBookings(getBookings())
+  const load = useCallback(async () => {
+    setLoading(true)
+    try { setBookings(await fetchBookings()); setError('') }
+    catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => { void load() }, 0)
+    return () => clearTimeout(timer)
+  }, [load])
+
+  async function cancel(id) {
+    setBusy(id)
+    setError('')
+    try {
+      await cancelMyBooking(id)
+      setMessage('Booking cancelled.')
+      await load()
+    } catch (e) { setError(e.message) }
+    finally { setBusy('') }
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
-      <div className="rounded-3xl bg-white/90 p-6 shadow-sm sm:p-8">
-        <p className="font-semibold text-blue-700">YOUR LEARNING JOURNEY</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">My Bookings</h1>
-        <p className="mt-3 text-slate-600">View and manage your demo mentor sessions.</p>
-      </div>
-
-      {bookings.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white/95 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-800">No bookings yet</h2>
-          <p className="mt-2 text-slate-500">Visit the Mentors page to book a demo slot.</p>
-          <Link to="/mentors" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700">Explore mentors</Link>
-        </div>
-      ) : (
-        <div className="mt-8 space-y-4">
-          {bookings.slice().reverse().map((booking) => (
-            <BookingCard key={booking.id} booking={booking} onCancel={handleCancel} />
-          ))}
-        </div>
-      )}
-
-      <p className="mt-8 text-sm text-slate-500">
-        Demo mode: bookings are stored in this browser, not a shared database.
-      </p>
+    <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <header className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+        <h1 className="text-3xl font-bold">My Bookings</h1>
+        <p className="mt-3 text-slate-600">Your account bookings from MongoDB.</p>
+      </header>
+      {message && <p role="status" className="mt-4 rounded-xl bg-green-50 p-4 text-green-800">{message}</p>}
+      {error && <p role="alert" className="mt-4 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
+      {loading ? <p className="mt-5">Loading bookings...</p> : bookings.length === 0
+        ? <div className="mt-6 rounded-2xl bg-white p-8 text-center"><p>No bookings found.</p><Link to="/mentors" className="mt-4 inline-block font-bold text-blue-700">Explore available slots →</Link></div>
+        : <div className="mt-6 space-y-4">{bookings.map(b => <article key={b.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-bold">{b.mentorName}</h2>
+            <p className="mt-2">{b.date} · {b.time}</p>
+            <p className="mt-2 font-semibold">Status: {b.status}</p>
+            {b.status === 'Booked' && <button disabled={!!busy} onClick={() => cancel(b.id)} className="mt-4 rounded-xl border border-red-200 px-4 py-2 font-semibold text-red-700 disabled:opacity-60">{busy === b.id ? 'Cancelling...' : 'Cancel booking'}</button>}
+          </article>)}</div>}
     </main>
   )
 }
-
 export default Bookings
+

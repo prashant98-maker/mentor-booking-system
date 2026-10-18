@@ -1,93 +1,62 @@
-﻿import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import MentorCard from '../../components/MentorCard'
-import SlotCard from '../../components/SlotCard'
-import mentors from '../../services/mentorService'
-import { addBooking, getBookings } from '../../services/bookingService'
-import { getSlots } from '../../services/slotService'
-
-function makeSlots() {
-  const slots = getSlots()
-  const bookings = getBookings()
-
-  return slots.map((slot) => ({
-    ...slot,
-    date: new Date(`${slot.date}T12:00:00`).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }),
-    available: !bookings.some(
-      (booking) =>
-        String(booking.slotId) === String(slot.id) &&
-        booking.status !== 'Cancelled',
-    ),
-  }))
-}
+﻿import { useCallback, useEffect, useState } from 'react'
+import { fetchSlots, createBooking } from '../../services/databaseService'
 
 function Mentors() {
-  const [slots, setSlots] = useState(makeSlots)
+  const [slots, setSlots] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [busy, setBusy] = useState('')
 
-  function handleBook(slot) {
-    const result = addBooking(slot)
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await fetchSlots()
+      setSlots(data.filter(s => s.available && s.date >= new Date().toLocaleDateString('en-CA')))
+      setError('')
+    } catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }, [])
 
-    if (!result.success) {
-      setMessage(result.message)
-      setSuccess(false)
-      setSlots(makeSlots())
-      return
-    }
+  useEffect(() => {
+    const timer = setTimeout(() => { void load() }, 0)
+    return () => clearTimeout(timer)
+  }, [load])
 
-    setSlots(makeSlots())
-    setMessage(`${slot.mentorName} ka slot book ho gaya!`)
-    setSuccess(true)
+  async function book(slot) {
+    setBusy(slot.id)
+    setError('')
+    setMessage('')
+    try {
+      await createBooking(slot.id)
+      setMessage('Booking successfully database mein save hui.')
+      await load()
+    } catch (e) { setError(e.message) }
+    finally { setBusy('') }
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-      <section>
-        <div className="max-w-3xl rounded-3xl bg-white/90 p-6 shadow-sm sm:p-8">
-          <p className="font-semibold text-blue-700">MENTORHUB • YOUR NEXT STEP</p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">
-            Meet Our Mentors
-          </h1>
-          <p className="mt-3 leading-7 text-slate-600">
-            Explore mentor profiles and find the right guidance for your goals.
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {mentors.map((mentor) => (
-            <MentorCard key={mentor.id} mentor={mentor} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-          Available Time Slots
-        </h2>
-        <p className="mt-2 text-slate-600">
-          Choose an available time to book a session with a mentor.
-        </p>
-
-        {message && (
-          <div className={`mt-5 rounded-xl p-4 text-sm ${success ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-900'}`}>
-            {message}
-            {success && <Link className="ml-2 font-bold underline" to="/bookings">View bookings</Link>}
-          </div>
-        )}
-
-        <div className="mt-6 space-y-4">
-          {slots.map((slot) => (
-            <SlotCard key={slot.id} slot={slot} onBook={handleBook} />
-          ))}
-        </div>
-      </section>
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <header className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+        <p className="font-semibold text-blue-700">MENTORHUB</p>
+        <h1 className="mt-2 text-3xl font-bold">Available Mentor Slots</h1>
+        <p className="mt-3 text-slate-600">Live slots loaded from the database.</p>
+      </header>
+      {message && <p role="status" className="mt-5 rounded-xl bg-green-50 p-4 text-green-800">{message}</p>}
+      {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
+      {loading ? <p className="mt-6">Loading available slots...</p> : slots.length === 0
+        ? <p className="mt-6 rounded-2xl bg-white p-6 text-slate-600">No available future slots. Please check again later.</p>
+        : <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {slots.map(s => <article key={s.id} className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold">{s.mentorName}</h2>
+              <p className="mt-3 text-slate-700">{s.date}</p><p className="mt-1 text-slate-600">{s.time}</p>
+              <button disabled={!!busy} onClick={() => book(s)} className="mt-5 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-60">
+                {busy === s.id ? 'Booking...' : 'Book this slot'}
+              </button>
+            </article>)}
+          </div>}
     </main>
   )
 }
-
 export default Mentors
+
