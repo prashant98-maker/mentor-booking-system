@@ -13,6 +13,8 @@ import { requireAuth } from './middleware/requireAuth.js'
 const app = express()
 const PORT = process.env.PORT || 10000
 
+app.set('trust proxy', 1)
+
 const allowedOrigins = [
   'http://localhost:5173',
   'https://mentor-booking-system.onrender.com',
@@ -34,8 +36,8 @@ app.get('/health', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
-app.use('/api', bookingRoutes)
 app.use('/api/mentors', mentorProfileRoutes)
+app.use('/api', bookingRoutes)
 
 app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({ success: true, user: req.user })
@@ -69,6 +71,3 @@ async function startServer() {
 }
 
 startServer()
-
-
-
