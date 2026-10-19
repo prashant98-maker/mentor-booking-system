@@ -1,4 +1,5 @@
-﻿import { useRef, useState } from 'react'
+﻿import MentorProfileEditor from './MentorProfileEditor'
+import { useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getProfilePhoto, saveProfilePhoto } from '../../services/profilePhotoService'
@@ -213,10 +214,13 @@ function Profile() {
               )}
             </div>
           </div>
-        </div>
+        
+      <MentorProfileEditor user={user} />
+    </div>
       </section>
     </main>
   )
 }
 
 export default Profile
+

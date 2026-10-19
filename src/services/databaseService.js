@@ -42,3 +42,22 @@ export async function updateBookingStatus(id, status) {
 export async function cancelMyBooking(id) {
   return api(`/bookings/${encodeURIComponent(id)}/cancel`, { method: 'PATCH' })
 }
+
+
+export async function fetchMentorProfiles() {
+  const response = await fetch(`${API_BASE}/api/mentors`)
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(data.message || 'Could not load mentor profiles.')
+  return data.mentors || []
+}
+
+export async function fetchMyMentorProfile() {
+  return (await api('/mentors/me')).profile
+}
+
+export async function saveMyMentorProfile(profile) {
+  return (await api('/mentors/me', {
+    method: 'PUT',
+    body: JSON.stringify(profile),
+  })).profile
+}
