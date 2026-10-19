@@ -26,6 +26,33 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'mentor'],
     required: true,
   },
+  bio: {
+    type: String,
+    trim: true,
+    maxlength: 1000,
+    default: '',
+  },
+  experience: {
+    type: Number,
+    min: 0,
+    max: 60,
+    default: 0,
+  },
+  skills: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: (skills) =>
+        skills.length <= 20 &&
+        skills.every(skill =>
+          typeof skill === 'string' &&
+          skill.trim().length > 0 &&
+          skill.trim().length <= 50
+        ),
+      message: 'Provide up to 20 valid skills.',
+    },
+  },
 }, { timestamps: true })
 
 export default mongoose.models.User || mongoose.model('User', userSchema)
+
