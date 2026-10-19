@@ -2,6 +2,7 @@
 import MainLayout from '../layouts/MainLayout'
 import Home from '../pages/home/Home'
 import Mentors from '../pages/mentors/Mentors'
+import MentorDetails from '../pages/mentors/MentorDetails'
 import Bookings from '../pages/bookings/Bookings'
 import MentorDashboard from '../pages/mentor/MentorDashboard'
 import Availability from '../pages/mentor/Availability'
@@ -75,6 +76,7 @@ function AppRoutes() {
         />
 
         <Route path="/profile" element={<Profile />} />
+        <Route path="/mentors/:id" element={<RoleGuard allowedRole="student"><MentorDetails /></RoleGuard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
@@ -82,3 +84,4 @@ function AppRoutes() {
 }
 
 export default AppRoutes
+

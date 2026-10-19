@@ -1,5 +1,5 @@
 ﻿const TOKEN_KEY = 'mentorhub_token'
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = import.meta.env.VITE_API_URL || 'https://mentor-booking-system-prashant.onrender.com'
 
 async function api(path, options = {}) {
   const token = localStorage.getItem(TOKEN_KEY)

@@ -6,6 +6,7 @@
     experience: '4 years experience',
     price: 'Free demo',
     bio: 'Learn HTML, CSS, JavaScript and React with practical guidance.',
+    skills: ['HTML', 'CSS', 'JavaScript', 'React'],
   },
   {
     id: 2,
@@ -14,6 +15,7 @@
     experience: '5 years experience',
     price: 'Free demo',
     bio: 'Get guidance on career planning, portfolios and interviews.',
+    skills: ['Career Planing', 'Portfolio', 'Interview'],
   },
   {
     id: 3,
@@ -22,6 +24,7 @@
     experience: '3 years experience',
     price: 'Free demo',
     bio: 'Build programming fundamentals and improve problem-solving skills.',
+    skills: ['JavaScript', 'Python', 'Problem Solving'],
   },
 ]
 
