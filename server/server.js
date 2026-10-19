@@ -7,13 +7,25 @@ import cors from 'cors'
 import { connectDB } from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
 import bookingRoutes from './routes/bookingRoutes.js'
+import mentorProfileRoutes from './routes/mentorProfileRoutes.js'
 import { requireAuth } from './middleware/requireAuth.js'
 
 const app = express()
 const PORT = process.env.PORT || 10000
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://mentor-booking-system.onrender.com',
+]
+
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Origin not allowed by CORS'))
+    }
+  },
 }))
 app.use(express.json({ limit: '20kb' }))
 
@@ -23,6 +35,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api', bookingRoutes)
+app.use('/api/mentors', mentorProfileRoutes)
 
 app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({ success: true, user: req.user })
@@ -56,4 +69,6 @@ async function startServer() {
 }
 
 startServer()
+
+
 
