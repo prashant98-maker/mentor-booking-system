@@ -7,6 +7,7 @@ import cors from 'cors'
 import { connectDB } from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
 import bookingRoutes from './routes/bookingRoutes.js'
+import reminderRoutes from './routes/reminderRoutes.js'
 import mentorProfileRoutes from './routes/mentorProfileRoutes.js'
 import { requireAuth } from './middleware/requireAuth.js'
 
@@ -17,6 +18,8 @@ app.set('trust proxy', 1)
 
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
   'https://mentor-booking-system.onrender.com',
 ]
 
@@ -37,6 +40,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/mentors', mentorProfileRoutes)
+app.use('/api/internal', reminderRoutes)
 app.use('/api', bookingRoutes)
 
 app.get('/api/auth/me', requireAuth, (req, res) => {
@@ -71,3 +75,5 @@ async function startServer() {
 }
 
 startServer()
+
+

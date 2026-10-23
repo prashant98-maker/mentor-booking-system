@@ -26,6 +26,26 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'mentor'],
     required: true,
   },
+  emailVerified: {
+    type: Boolean,
+    default: true,
+  },
+  emailVerificationTokenHash: {
+    type: String,
+    select: false,
+  },
+  emailVerificationExpires: {
+    type: Date,
+    select: false,
+  },
+  emailVerificationConsumedTokenHash: {
+    type: String,
+    select: false,
+  },
+  emailVerificationConsumedExpires: {
+    type: Date,
+    select: false,
+  },
   bio: {
     type: String,
     trim: true,
@@ -55,4 +75,3 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 export default mongoose.models.User || mongoose.model('User', userSchema)
-

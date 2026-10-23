@@ -9,6 +9,8 @@ import Availability from '../pages/mentor/Availability'
 import MentorSessions from '../pages/mentor/MentorSessions'
 import Login from '../pages/auth/Login'
 import Signup from '../pages/auth/Signup'
+import VerifyEmail from '../pages/auth/VerifyEmail'
+import ResendVerification from '../pages/auth/ResendVerification'
 import StudentDashboard from '../pages/student/StudentDashboard'
 import Profile from '../pages/profile/Profile'
 import RoleGuard from '../context/RoleGuard'
@@ -20,6 +22,8 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/resend-verification" element={<ResendVerification />} />
 
         <Route
           path="/student-dashboard"
@@ -84,4 +88,6 @@ function AppRoutes() {
 }
 
 export default AppRoutes
+
+
 

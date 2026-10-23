@@ -1,16 +1,16 @@
 ﻿import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { signup } from '../../services/authService'
 
 function Signup() {
-  const { user, login } = useAuth()
-  const navigate = useNavigate()
+  const { user } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('student')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   if (user) {
@@ -20,6 +20,7 @@ function Signup() {
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
+    setSuccess('')
 
     if (password.length < 8 || password.length > 72) {
       setError('Password must be between 8 and 72 characters.')
@@ -29,8 +30,8 @@ function Signup() {
     setLoading(true)
     try {
       const result = await signup({ name, email, password, role })
-      login(result)
-      navigate(result.user.role === 'mentor' ? '/mentor-dashboard' : '/student-dashboard')
+      setSuccess(result.message || 'Account created. Please check your email for the verification link.')
+      setPassword('')
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.')
     } finally {
@@ -46,6 +47,7 @@ function Signup() {
         <p className="mt-2 text-slate-600">Register as a student or mentor.</p>
 
         {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        {success && <p role="status" className="mt-5 rounded-xl bg-green-50 p-3 text-sm text-green-800">{success}</p>}
 
         <form onSubmit={handleSubmit} className="mt-7 space-y-5">
           <div>

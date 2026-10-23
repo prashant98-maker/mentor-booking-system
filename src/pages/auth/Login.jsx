@@ -55,9 +55,11 @@ function Login() {
         </form>
 
         <p className="mt-6 text-sm text-slate-600">New here? <Link to="/signup" className="font-bold text-blue-700 underline">Create an account</Link></p>
+        <p className="mt-3 text-sm text-slate-600">Verification link expired? <Link to="/resend-verification" className="font-bold text-blue-700 underline">Resend verification email</Link></p>
       </section>
     </main>
   )
 }
 
 export default Login
+

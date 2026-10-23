@@ -61,3 +61,10 @@ export async function saveMyMentorProfile(profile) {
     body: JSON.stringify(profile),
   })).profile
 }
+
+export async function rateBooking(id, { stars, review }) {
+  return api(`/bookings/${encodeURIComponent(id)}/rating`, {
+    method: 'PATCH',
+    body: JSON.stringify({ stars, review }),
+  })
+}
