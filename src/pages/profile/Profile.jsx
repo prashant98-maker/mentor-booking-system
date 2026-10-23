@@ -1,8 +1,12 @@
-﻿import MentorProfileEditor from './MentorProfileEditor'
-import { useRef, useState } from 'react'
+import MentorProfileEditor from './MentorProfileEditor'
+import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getProfilePhoto, saveProfilePhoto } from '../../services/profilePhotoService'
+import {
+  fetchMyMentorProfile,
+  saveMyMentorPhoto,
+} from '../../services/databaseService'
 
 function Profile() {
   const { user } = useAuth()
@@ -11,12 +15,45 @@ function Profile() {
   const [message, setMessage] = useState('')
   const [saving, setSaving] = useState(false)
 
+  const isMentor = user?.role === 'mentor'
+  const initial = user?.name?.trim()?.charAt(0)?.toUpperCase() || '?'
+
+  useEffect(() => {
+    if (!user || user.role !== 'mentor') return
+
+    let active = true
+
+    async function loadServerPhoto() {
+      try {
+        const profile = await fetchMyMentorProfile()
+        if (!active) return
+
+        const serverPhoto = profile.profilePhoto || ''
+        const key = `mentorhub_profile_photo_${encodeURIComponent(user.role)}_${encodeURIComponent(user.name.trim().toLowerCase())}`
+
+        if (serverPhoto) {
+          saveProfilePhoto(user, serverPhoto)
+          setPhoto(serverPhoto)
+        } else {
+          localStorage.removeItem(key)
+          window.dispatchEvent(new Event('mentorhub-profile-photo-updated'))
+          setPhoto(null)
+        }
+      } catch {
+        // Keep the locally cached photo if the server is unavailable.
+      }
+    }
+
+    loadServerPhoto()
+
+    return () => {
+      active = false
+    }
+  }, [user])
+
   if (!user) {
     return <Navigate to="/login" replace />
   }
-
-  const isMentor = user.role === 'mentor'
-  const initial = user.name?.trim()?.charAt(0)?.toUpperCase() || '?'
 
   async function handlePhotoChange(event) {
     const file = event.target.files?.[0]
@@ -64,9 +101,17 @@ function Profile() {
       context.drawImage(image, 0, 0, canvas.width, canvas.height)
       const compressedPhoto = canvas.toDataURL('image/jpeg', 0.82)
 
+      if (isMentor) {
+        await saveMyMentorPhoto(compressedPhoto)
+      }
+
       saveProfilePhoto(user, compressedPhoto)
       setPhoto(compressedPhoto)
-      setMessage('Profile photo saved successfully!')
+      setMessage(
+        isMentor
+          ? 'Profile photo saved to your account!'
+          : 'Profile photo saved in this browser.',
+      )
     } catch (error) {
       setMessage(error.message || 'Could not save the photo. Please try another image.')
     } finally {
@@ -74,15 +119,24 @@ function Profile() {
     }
   }
 
-  function removePhoto() {
+  async function removePhoto() {
+    setSaving(true)
+    setMessage('')
+
     try {
+      if (isMentor) {
+        await saveMyMentorPhoto('')
+      }
+
       const key = `mentorhub_profile_photo_${encodeURIComponent(user.role)}_${encodeURIComponent(user.name.trim().toLowerCase())}`
       localStorage.removeItem(key)
       window.dispatchEvent(new Event('mentorhub-profile-photo-updated'))
       setPhoto(null)
       setMessage('Profile photo removed.')
-    } catch {
-      setMessage('Could not remove the photo.')
+    } catch (error) {
+      setMessage(error.message || 'Could not remove the photo.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -187,15 +241,19 @@ function Profile() {
                 <p className="text-sm font-semibold text-slate-500">Profile photo</p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
                   {photo
-                    ? 'Your photo is saved in this browser and appears in the navigation bar.'
+                    ? isMentor
+                      ? 'Your photo is saved to your mentor account and can appear on mentor cards across devices.'
+                      : 'Your photo is saved in this browser and appears in the navigation bar.'
                     : 'You have not uploaded a photo yet. Upload one to personalise your profile.'}
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-              This is a demo profile. Your photo is stored locally in this browser, not on a server, so it will not automatically appear on another device or browser.
-            </div>
+            {!isMentor && (
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+                Student profile photos are currently stored only in this browser.
+              </div>
+            )}
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
@@ -214,13 +272,12 @@ function Profile() {
               )}
             </div>
           </div>
-        
-      <MentorProfileEditor user={user} />
-    </div>
+
+          <MentorProfileEditor user={user} />
+        </div>
       </section>
     </main>
   )
 }
 
 export default Profile
-

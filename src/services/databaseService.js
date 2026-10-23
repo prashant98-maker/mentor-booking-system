@@ -1,4 +1,4 @@
-﻿const TOKEN_KEY = 'mentorhub_token'
+const TOKEN_KEY = 'mentorhub_token'
 const API_BASE = import.meta.env.VITE_API_URL || 'https://mentor-booking-system-prashant.onrender.com'
 
 async function api(path, options = {}) {
@@ -62,6 +62,12 @@ export async function saveMyMentorProfile(profile) {
   })).profile
 }
 
+export async function saveMyMentorPhoto(profilePhoto) {
+  return (await api('/mentors/me/photo', {
+    method: 'PUT',
+    body: JSON.stringify({ profilePhoto }),
+  })).profile
+}
 export async function rateBooking(id, { stars, review }) {
   return api(`/bookings/${encodeURIComponent(id)}/rating`, {
     method: 'PATCH',

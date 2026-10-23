@@ -1,4 +1,4 @@
-﻿import dns from 'node:dns'
+import dns from 'node:dns'
 dns.setServers(['8.8.8.8', '1.1.1.1'])
 
 import 'dotenv/config'
@@ -32,7 +32,7 @@ app.use(cors({
     }
   },
 }))
-app.use(express.json({ limit: '20kb' }))
+app.use(express.json({ limit: '2mb' }))
 
 app.get('/health', (req, res) => {
   res.json({ success: true, message: 'Mentor Booking System backend is running' })

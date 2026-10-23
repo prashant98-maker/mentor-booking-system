@@ -1,16 +1,30 @@
-﻿import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 function MentorCard({ mentor }) {
   const skills = mentor.skills || []
   const initials = (mentor.name || 'Mentor')
-    .split(' ').map(part => part[0]).slice(0, 2).join('').toUpperCase()
+    .split(' ')
+    .map(part => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
   return (
     <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <div className="h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-400" />
       <div className="p-5">
         <div className="flex items-start gap-3">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 text-lg font-extrabold text-blue-800">{initials}</div>
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-lg font-extrabold text-blue-800">
+            {mentor.profilePhoto ? (
+              <img
+                src={mentor.profilePhoto}
+                alt={`${mentor.name}'s profile`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              initials
+            )}
+          </div>
           <div className="min-w-0 flex-1">
             <h2 className="break-words text-lg font-bold text-slate-900">{mentor.name}</h2>
             <p className="mt-1 text-sm font-medium text-blue-700">{mentor.experience || 0} years experience</p>
