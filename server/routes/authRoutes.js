@@ -86,7 +86,7 @@ router.post('/resend-verification', resendVerificationLimit, async (req, res, ne
       })
     }
 
-    const frontendUrl = process.env.FRONTEND_URL
+    const frontendUrl = (process.env.FRONTEND_URL || process.env.CLIENT_ORIGIN)
 
     if (!frontendUrl) {
       return res.status(503).json({
@@ -180,7 +180,7 @@ router.post('/signup', authLimit, async (req, res, next) => {
       emailVerificationExpires: verificationExpires,
     })
 
-    const frontendUrl = process.env.FRONTEND_URL
+    const frontendUrl = (process.env.FRONTEND_URL || process.env.CLIENT_ORIGIN)
     if (!frontendUrl) {
       await User.deleteOne({ _id: user._id })
       return res.status(500).json({
@@ -201,7 +201,7 @@ router.post('/signup', authLimit, async (req, res, next) => {
       })
     } catch (emailError) {
       await User.deleteOne({ _id: user._id })
-      console.error('Verification email could not be sent.')
+      console.error('Verification email failed:', { code: emailError?.code, responseCode: emailError?.responseCode, command: emailError?.command, message: emailError?.message })
       return res.status(503).json({
         success: false,
         message: 'Verification email could not be sent. Please try signing up again later.',
@@ -334,6 +334,9 @@ router.post('/login', authLimit, async (req, res, next) => {
 })
 
 export default router
+
+
+
 
 
 
