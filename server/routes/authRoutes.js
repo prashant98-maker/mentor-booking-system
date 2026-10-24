@@ -118,8 +118,12 @@ router.post('/resend-verification', resendVerificationLimit, async (req, res, ne
       user.emailVerificationExpires = undefined
       await user.save()
 
-      console.error('Resend verification email could not be sent.')
-
+      console.error('Resend verification email failed:', {
+      code: emailError?.code,
+      responseCode: emailError?.responseCode,
+      command: emailError?.command,
+      message: emailError?.message,
+     })
       return res.status(503).json({
         success: false,
         message: 'Email service is temporarily unavailable. Please try again later.',
