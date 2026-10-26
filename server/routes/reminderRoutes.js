@@ -1,4 +1,4 @@
-﻿import { Router } from 'express'
+import { Router } from 'express'
 import { timingSafeEqual } from 'node:crypto'
 import Booking from '../models/Booking.js'
 import { sendEmail } from '../config/mailer.js'
@@ -181,7 +181,7 @@ router.post('/session-reminders', async (req, res) => {
       }
     }
 
-    return res.json({ success: true, sent, failed, skipped })
+    return res.status(200).send("OK")
   } catch {
     // Do not expose database, SMTP, or secret-related details to callers.
     return res.status(500).json({
@@ -195,4 +195,3 @@ router.post('/session-reminders', async (req, res) => {
 })
 
 export default router
-

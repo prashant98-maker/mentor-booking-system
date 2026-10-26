@@ -29,7 +29,7 @@ function StudentDashboard() {
   ]
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">z
       <header className="rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-800 p-7 text-white shadow-lg sm:p-10">
         <p className="font-bold uppercase tracking-widest text-blue-100">Student dashboard</p>
         <h1 className="mt-3 text-3xl font-extrabold">Welcome, {user?.name || 'Student'}!</h1>

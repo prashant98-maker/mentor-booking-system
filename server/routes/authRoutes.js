@@ -204,7 +204,7 @@ router.post('/signup', authLimit, async (req, res, next) => {
         html: `<p>Welcome to MentorHub!</p><p>Please verify your email within 30 minutes:</p><p><a href="${verificationUrl.toString()}">Verify email</a></p><p>If you did not create this account, you can ignore this email.</p>`,
       })
     } catch (emailError) {
-      // Keep the account so verification can be retried later.
+      await User.deleteOne({ _id: user._id })
       console.error('Verification email failed:', { code: emailError?.code, responseCode: emailError?.responseCode, command: emailError?.command, message: emailError?.message })
       return res.status(503).json({
         success: false,
