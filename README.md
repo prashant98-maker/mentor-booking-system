@@ -1,70 +1,124 @@
-﻿# Mentor Booking System
+﻿# MentorHub — Mentor Booking System
 
-A React-based mentor booking application where students can explore mentors and manage bookings, while mentors can manage availability and sessions.
-
-## Technologies Used
-
-- React
-- Vite
-- React Router
-- Tailwind CSS
-- JavaScript
+MentorHub helps students discover mentors, explore available sessions, and manage bookings. Mentors can manage their profiles, availability, and mentoring sessions.
 
 ## Features
 
-- Role-based demo experience for students and mentors
-- Student and mentor dashboards
-- Mentor availability and session pages
-- Student booking pages
-- Profile page with profile photo selection
-- Responsive navigation
+### Student
+- Student dashboard
+- Browse mentors and view mentor details
+- Explore and manage bookings
+- View profile information
 
-## Setup Instructions
+### Mentor
+- Mentor dashboard
+- Manage mentor profile
+- Create and manage availability
+- Manage mentoring sessions
 
-Requirements: Node.js and npm.
+### Authentication
+- Signup and login pages
+- Email verification and resend verification pages
+- Role-based route protection
 
-1. Clone or download this repository.
-2. Open a terminal in the project directory.
-3. Install dependencies:
+### User Interface
+- Responsive design
+- Reusable React components
+- React Router navigation
+- Tailwind CSS styling
 
-   ```bash
-   npm install
-   ```
+> Test features in the deployed application before considering them production-ready.
 
-4. Start the development server:
+## Technology Stack
 
-   ```bash
-   npm run dev
-   ```
+**Frontend:** React, Vite, React Router, Tailwind CSS, JavaScript
 
-5. Create a production build:
+**Backend:** Node.js, Express.js, MongoDB, Mongoose, JWT, bcryptjs, Nodemailer
 
-   ```bash
-   npm run build
-   ```
+## Project Structure
 
-## Authentication and Data Limitations
+```text
+mentor-booking-system/
+├── public/
+├── src/
+│   ├── components/
+│   ├── context/
+│   ├── layouts/
+│   ├── pages/
+│   ├── routes/
+│   └── services/
+├── server/
+│   ├── config/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── .env.example
+│   └── server.js
+├── index.html
+├── package.json
+└── README.md
 
-The current login is a demo flow, not production authentication. Do not use real passwords or sensitive personal information.
+Getting Started
 
-The profile photo is stored locally in the browser. It is not uploaded to a server and will not automatically appear on another device.
+Requirements
 
-Backend authentication, server-side data persistence, email confirmations, reminders, and production-grade booking concurrency must be verified or implemented before claiming them as complete.
+- Node.js
+- npm
 
-## Project Status
+Run the Frontend
 
-Frontend demo version. Backend integration and deployment are planned.
+Run these commands from the project root:
 
-## Deployment
+npm install
+npm run dev
 
-The frontend can be deployed as a static site on Render. The publish directory is `dist`, and the build command is:
+Create a production build:
 
-```bash
-npm install && npm run build
-```
+npm run build
 
-## Known Limitations
+Preview the production build:
 
-- Demo login does not verify email and password.
-- Browser-local profile photos are not shared between devices.
-- Features requiring a backend or email service depend on backend integration.
+npm run preview
+
+Run the Backend
+
+Open a separate terminal and run these commands from the project root:
+
+cd server
+npm install
+npm run dev
+
+Configure backend environment variables using "server/.env.example" as a reference. Keep your actual "server/.env" private.
+
+Deployment
+
+Frontend
+
+- Build command: "npm install && npm run build"
+- Publish directory: "dist"
+
+Backend
+
+Deploy the Node.js backend separately and configure the required environment variables in your hosting provider's dashboard.
+
+Configure the frontend API base URL to point to the deployed backend where required.
+
+Security
+
+- Never commit ".env" files, passwords, API keys, database credentials, or JWT secrets.
+- Keep backend secrets out of frontend code.
+- Use HTTPS and secure production configuration.
+- Test authentication and role-based authorization.
+
+Known Considerations
+
+- Test signup, login, and email verification end to end.
+- Verify that bookings and mentor availability persist correctly.
+- Test booking conflicts and authorization.
+- Email notifications and reminders depend on working email delivery and scheduler configuration.
+- Verify profile photo storage and cross-device behavior.
+- A successful frontend build does not guarantee that backend functionality works correctly.
+
+Project Status
+
+MentorHub includes a React frontend and a separate Express/MongoDB backend. Production readiness depends on end-to-end testing, deployment configuration, email delivery, and booking behavior.
